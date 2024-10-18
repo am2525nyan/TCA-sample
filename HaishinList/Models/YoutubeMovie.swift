@@ -10,5 +10,5 @@ struct YoutubeMovie: Equatable,Decodable{
     let title: String
     let videoId: String
     let thumbnailUrl: String
-    let videoUrl: String
+ //   let videoUrl: String
 }

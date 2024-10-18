@@ -11,6 +11,7 @@ import Foundation
 @Reducer
 struct ListReducer {
     @Dependency(\.twitchAPIClient) var twitchAPIClient
+    @Dependency(\.youtubeAPIClient) var youtubeAPIClient
     @ObservableState
     struct Environment {
         var twitchAPIClient: TwitchAPIClient
@@ -32,7 +33,7 @@ struct ListReducer {
     
     enum Action {
         case fetchMovies
-        case fetchMoviesResponse(TaskResult<TwitchMovie>)
+        case fetchTwitchMoviesResponse(TaskResult<TwitchMovie>)
         
     }
     
@@ -43,15 +44,15 @@ struct ListReducer {
                 state.isLoading = true
                 state.errorMessage = nil
                 return .run { send in
-                    await send(.fetchMoviesResponse(TaskResult { try await self.twitchAPIClient.fetchMovie() }))
+                    await send(.fetchTwitchMoviesResponse(TaskResult { try await self.twitchAPIClient.fetchMovie() }))
                 }
                 
-            case let .fetchMoviesResponse(.success(movie)):
+            case let .fetchTwitchMoviesResponse(.success(movie)):
                 state.isLoading = false
                 state.movie = movie
                 return .none
                 
-            case let .fetchMoviesResponse(.failure(error)):
+            case let .fetchTwitchMoviesResponse(.failure(error)):
                 state.isLoading = false
                 state.errorMessage = error.localizedDescription
                 return .none
@@ -63,11 +64,21 @@ struct ListReducer {
 
 private enum TwitchAPIClientKey: DependencyKey {
     static let liveValue = TwitchAPIClient.live
+    
 }
+private enum YoutubeAPIClientKey: DependencyKey {
+    static let liveValue = YoutubeAPIClient.live
+    
+}
+
 
 extension DependencyValues {
     var twitchAPIClient: TwitchAPIClient {
         get { self[TwitchAPIClientKey.self] }
         set { self[TwitchAPIClientKey.self] = newValue }
+    }
+    var youtubeAPIClient: YoutubeAPIClient {
+        get { self[YoutubeAPIClientKey.self] }
+        set { self[YoutubeAPIClientKey.self] = newValue }
     }
 }

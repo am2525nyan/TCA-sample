@@ -8,15 +8,31 @@
 
 /* Begin PBXBuildFile section */
 		72323DED2CB4F886000EF314 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 72323DEC2CB4F886000EF314 /* ComposableArchitecture */; };
+		72323E022CB50C79000EF314 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 72323E012CB50C79000EF314 /* Alamofire */; };
+		72323E0D2CB54770000EF314 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 72323E0C2CB54770000EF314 /* GoogleSignIn */; };
+		72323E0F2CB54770000EF314 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 72323E0E2CB54770000EF314 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		72323DDA2CB4ECBE000EF314 /* HaishinList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HaishinList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		72323E0A2CB54664000EF314 /* Exceptions for "HaishinList" folder in "HaishinList" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 72323DD92CB4ECBE000EF314 /* HaishinList */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		72323DDC2CB4ECBE000EF314 /* HaishinList */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				72323E0A2CB54664000EF314 /* Exceptions for "HaishinList" folder in "HaishinList" target */,
+			);
 			path = HaishinList;
 			sourceTree = "<group>";
 		};
@@ -28,6 +44,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				72323DED2CB4F886000EF314 /* ComposableArchitecture in Frameworks */,
+				72323E022CB50C79000EF314 /* Alamofire in Frameworks */,
+				72323E0D2CB54770000EF314 /* GoogleSignIn in Frameworks */,
+				72323E0F2CB54770000EF314 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +90,9 @@
 			name = HaishinList;
 			packageProductDependencies = (
 				72323DEC2CB4F886000EF314 /* ComposableArchitecture */,
+				72323E012CB50C79000EF314 /* Alamofire */,
+				72323E0C2CB54770000EF314 /* GoogleSignIn */,
+				72323E0E2CB54770000EF314 /* GoogleSignInSwift */,
 			);
 			productName = HaishinList;
 			productReference = 72323DDA2CB4ECBE000EF314 /* HaishinList.app */;
@@ -102,6 +124,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				72323DEB2CB4F886000EF314 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				72323E002CB50C79000EF314 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				72323E0B2CB54770000EF314 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 72323DDB2CB4ECBE000EF314 /* Products */;
@@ -264,6 +288,7 @@
 				DEVELOPMENT_TEAM = TVH687AC7F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HaishinList/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -293,6 +318,7 @@
 				DEVELOPMENT_TEAM = TVH687AC7F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HaishinList/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -343,6 +369,22 @@
 				minimumVersion = 1.15.0;
 			};
 		};
+		72323E002CB50C79000EF314 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.1;
+			};
+		};
+		72323E0B2CB54770000EF314 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -350,6 +392,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 72323DEB2CB4F886000EF314 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
+		};
+		72323E012CB50C79000EF314 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 72323E002CB50C79000EF314 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		72323E0C2CB54770000EF314 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 72323E0B2CB54770000EF314 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		72323E0E2CB54770000EF314 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 72323E0B2CB54770000EF314 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

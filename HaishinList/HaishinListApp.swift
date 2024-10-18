@@ -7,11 +7,19 @@
 
 import SwiftUI
 
+import ComposableArchitecture
+
+
 @main
 struct HaishinListApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ListView(
+                store: Store(initialState: ListReducer.State()){
+                ListReducer()
+            }
+                )
+          
         }
     }
 }

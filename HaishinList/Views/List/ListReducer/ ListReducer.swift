@@ -16,27 +16,26 @@ struct ListReducer {
     struct Environment {
         var twitchAPIClient: TwitchAPIClient
         var mainQueue: AnySchedulerOf<DispatchQueue>
-        
+
         static let live = Self(
             twitchAPIClient: .live,
             mainQueue: .main
         )
     }
-    
+
     @ObservableState
     struct State {
         var movie: TwitchMovie? = nil
         var isLoading: Bool = false
         var errorMessage: String? = nil
     }
-    
-    
+
     enum Action {
         case fetchMovies
         case fetchTwitchMoviesResponse(TaskResult<TwitchMovie>)
-        
+
     }
-    
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -44,14 +43,18 @@ struct ListReducer {
                 state.isLoading = true
                 state.errorMessage = nil
                 return .run { send in
-                    await send(.fetchTwitchMoviesResponse(TaskResult { try await self.twitchAPIClient.fetchMovie() }))
+                    await send(
+                        .fetchTwitchMoviesResponse(
+                            TaskResult {
+                                try await self.twitchAPIClient.fetchMovie()
+                            }))
                 }
-                
+
             case let .fetchTwitchMoviesResponse(.success(movie)):
                 state.isLoading = false
                 state.movie = movie
                 return .none
-                
+
             case let .fetchTwitchMoviesResponse(.failure(error)):
                 state.isLoading = false
                 state.errorMessage = error.localizedDescription
@@ -61,16 +64,14 @@ struct ListReducer {
     }
 }
 
-
 private enum TwitchAPIClientKey: DependencyKey {
     static let liveValue = TwitchAPIClient.live
-    
+
 }
 private enum YoutubeAPIClientKey: DependencyKey {
     static let liveValue = YoutubeAPIClient.live
-    
-}
 
+}
 
 extension DependencyValues {
     var twitchAPIClient: TwitchAPIClient {

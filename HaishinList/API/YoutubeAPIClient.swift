@@ -5,9 +5,9 @@
 //  Created by saki on 2024/10/08.
 //
 
-import Foundation
 import Alamofire
 import ComposableArchitecture
+import Foundation
 
 struct YoutubeAPIClient {
     var fetchMovie: () async throws -> YoutubeMovie
@@ -15,7 +15,8 @@ struct YoutubeAPIClient {
 extension YoutubeAPIClient {
     static let live = Self(
         fetchMovie: {
-            let urlString = "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCu2Fxqf37DAZ0ZhIsd1FZwA&type=video"
+            let urlString =
+                "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCu2Fxqf37DAZ0ZhIsd1FZwA&type=video"
             return try await withCheckedThrowingContinuation { continuation in
                 AF.request(urlString, method: .get)
                     .responseData { response in
@@ -25,34 +26,39 @@ extension YoutubeAPIClient {
                         switch response.result {
                         case .success(let data):
                             do {
-                                
+
                                 print(data)
-                                
+
                                 let decoder = JSONDecoder()
-                                let youtubeResponse = try decoder.decode(YoutubeResponse.self, from: data)
+                                let youtubeResponse = try decoder.decode(
+                                    YoutubeResponse.self, from: data)
                                 print(youtubeResponse)
-                                let movies = youtubeResponse.items.map { streamData in
+                                let movies = youtubeResponse.items.map {
+                                    streamData in
                                     YoutubeMovie(
                                         title: streamData.snippet.title,
                                         videoId: streamData.channnelTitle,
-                                        thumbnailUrl: streamData.snippet.thumbnails.high.url
+                                        thumbnailUrl: streamData.snippet
+                                            .thumbnails.high.url
                                     )
-                                    
+
                                 }
                                 print("成功！", movies)
                                 continuation.resume(returning: movies.first!)
                             } catch {
                                 print("デコード失敗:", error.localizedDescription)
-                                continuation.resume(throwing: APIError.decodingError(error))
+                                continuation.resume(
+                                    throwing: APIError.decodingError(error))
                             }
-                            
+
                         case .failure(let error):
                             print("失敗！", error.localizedDescription)
-                            continuation.resume(throwing: APIError.invalidResponse(error))
+                            continuation.resume(
+                                throwing: APIError.invalidResponse(error))
                         }
                     }
             }
-            
+
         })
 }
 
@@ -60,7 +66,7 @@ struct YoutubeStreamData: Decodable {
     let title: String
     let user_name: String
     let thumbnail_url: String
- 
+
 }
 
 struct YoutubeResponse: Decodable {

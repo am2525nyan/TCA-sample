@@ -14,7 +14,7 @@ import ComposableArchitecture
 struct HaishinListApp: App {
     var body: some Scene {
         WindowGroup {
-            ListView(
+            ListItemView(
                 store: Store(initialState: ListReducer.State()){
                 ListReducer()
             }

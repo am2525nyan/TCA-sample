@@ -16,28 +16,28 @@ extension YoutubeAPIClient {
     static let live = Self(
         fetchMovie: {
             let urlString =
-                "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCu2Fxqf37DAZ0ZhIsd1FZwA&type=video"
+                "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCu2Fxqf37DAZ0ZhIsd1FZwA&eventType=live&type=video&key=AIzaSyB1nlErMhG9T89Rr7HiPf5ZyUnNdDzCIwQ"
+
             return try await withCheckedThrowingContinuation { continuation in
                 AF.request(urlString, method: .get)
                     .responseData { response in
                         if let statusCode = response.response?.statusCode {
                             print("Status Code: \(statusCode)")
                         }
+                        print(response.result)
                         switch response.result {
                         case .success(let data):
                             do {
 
-                                print(data)
-
                                 let decoder = JSONDecoder()
                                 let youtubeResponse = try decoder.decode(
                                     YoutubeResponse.self, from: data)
-                                print(youtubeResponse)
+                                print(youtubeResponse, "youtube")
                                 let movies = youtubeResponse.items.map {
                                     streamData in
                                     YoutubeMovie(
                                         title: streamData.snippet.title,
-                                        videoId: streamData.channnelTitle,
+                                        name: streamData.snippet.channelTitle, videoId: streamData.id.videoId,
                                         thumbnailUrl: streamData.snippet
                                             .thumbnails.high.url
                                     )
@@ -62,32 +62,34 @@ extension YoutubeAPIClient {
         })
 }
 
-struct YoutubeStreamData: Decodable {
-    let title: String
-    let user_name: String
-    let thumbnail_url: String
-
-}
-
 struct YoutubeResponse: Decodable {
     let items: [YouTubeItem]
 }
+
 struct YouTubeItem: Decodable {
-    let snippet: YouTubeSnippet
     let id: ResourceId
-    let channnelTitle: String
+    let snippet: YouTubeSnippet
 }
+
 struct YouTubeSnippet: Decodable {
+    let publishedAt: String
+    let channelId: String
     let title: String
-    let liveBroadcastContent: String
+    let description: String
     let thumbnails: Thumbnails
+    let channelTitle: String
+    let liveBroadcastContent: String
+    let publishTime: String
 }
+
 struct Thumbnails: Decodable {
     let high: Thumbnail
 }
+
 struct Thumbnail: Decodable {
     let url: String
 }
+
 struct ResourceId: Decodable {
     let videoId: String
 }

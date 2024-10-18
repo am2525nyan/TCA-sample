@@ -15,17 +15,20 @@ struct ListReducer {
     @ObservableState
     struct Environment {
         var twitchAPIClient: TwitchAPIClient
+        var youtubeAPIClient: YoutubeAPIClient
         var mainQueue: AnySchedulerOf<DispatchQueue>
 
         static let live = Self(
             twitchAPIClient: .live,
+            youtubeAPIClient: .live,
             mainQueue: .main
         )
     }
 
     @ObservableState
     struct State {
-        var movie: TwitchMovie? = nil
+        var twitchMovie: TwitchMovie? = nil
+        var youtubeMovie: YoutubeMovie? = nil
         var isLoading: Bool = false
         var errorMessage: String? = nil
     }
@@ -33,7 +36,7 @@ struct ListReducer {
     enum Action {
         case fetchMovies
         case fetchTwitchMoviesResponse(TaskResult<TwitchMovie>)
-
+        case fetchYoutubeMoviesResponse(TaskResult<YoutubeMovie>)
     }
 
     var body: some ReducerOf<Self> {
@@ -48,14 +51,29 @@ struct ListReducer {
                             TaskResult {
                                 try await self.twitchAPIClient.fetchMovie()
                             }))
+                    await send(
+                        .fetchYoutubeMoviesResponse(
+                            TaskResult {
+                                try await self.youtubeAPIClient.fetchMovie()
+                            }))
                 }
 
             case let .fetchTwitchMoviesResponse(.success(movie)):
                 state.isLoading = false
-                state.movie = movie
+                state.twitchMovie = movie
                 return .none
 
             case let .fetchTwitchMoviesResponse(.failure(error)):
+                state.isLoading = false
+                state.errorMessage = error.localizedDescription
+                return .none
+         
+            case let .fetchYoutubeMoviesResponse(.success(movie)):
+                state.isLoading = false
+                state.youtubeMovie = movie
+                return .none
+
+            case let .fetchYoutubeMoviesResponse(.failure(error)):
                 state.isLoading = false
                 state.errorMessage = error.localizedDescription
                 return .none

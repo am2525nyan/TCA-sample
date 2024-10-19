@@ -12,7 +12,7 @@ import Foundation
 struct TwitchAPIClient {
     let accessToken = "36f8wvix1lupsvy8q6wlab9w6dll5"
     let clientId = "k1p1y8bhkrjvps84wlodei5fe67696"
-    let userId = "726693099"
+    let userId = "136255354"
     var fetchMovie: () async throws -> TwitchMovie
 
 }
@@ -20,15 +20,20 @@ struct TwitchAPIClient {
 extension TwitchAPIClient {
     static let live = Self(
         fetchMovie: {
-            let urlString =
-                "https://api.twitch.tv/helix/streams?user_id=205775893"
+            var url = URLComponents()
+            url.scheme = "https"
+            url.host = "api.twitch.tv"
+            url.path = "/helix/streams"
+            url.queryItems = [
+                URLQueryItem(name: "user_id", value:  "136255354"),]
+         
             let headers: HTTPHeaders = [
                 "Authorization": "Bearer 2ebbs1l05ii5zbfq1i0g4pacvhxrdc",
                 "Client-Id": "k1p1y8bhkrjvps84wlodei5fe67696",
             ]
 
             return try await withCheckedThrowingContinuation { continuation in
-                AF.request(urlString, method: .get, headers: headers)
+                AF.request(url, method: .get, headers: headers)
                     .responseData { response in
                         if let statusCode = response.response?.statusCode {
                             print("Status Code: \(statusCode)")
@@ -36,8 +41,6 @@ extension TwitchAPIClient {
                         switch response.result {
                         case .success(let data):
                             do {
-
-                                print(data)
 
                                 let decoder = JSONDecoder()
                                 let twitchResponse = try decoder.decode(
@@ -57,7 +60,14 @@ extension TwitchAPIClient {
 
                                 }
                                 print("成功！", movies)
-                                continuation.resume(returning: movies.first!)
+                                if movies.isEmpty{
+                                    continuation.resume(
+                                        throwing: APIError.invalidData
+                                    )
+                                }else{
+                                    continuation.resume(returning: movies.first!)
+                                }
+                                
                             } catch {
                                 print("デコード失敗:", error.localizedDescription)
                                 continuation.resume(

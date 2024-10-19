@@ -15,9 +15,17 @@ struct YoutubeAPIClient {
 extension YoutubeAPIClient {
     static let live = Self(
         fetchMovie: {
-            let urlString =
-                "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCu2Fxqf37DAZ0ZhIsd1FZwA&eventType=live&type=video&key=AIzaSyB1nlErMhG9T89Rr7HiPf5ZyUnNdDzCIwQ"
-
+            var urlString = URLComponents()
+            urlString.scheme = "https"
+            urlString.host = "www.googleapis.com"
+            urlString.path = "/youtube/v3/search"
+            urlString.queryItems = [
+                URLQueryItem(name: "part", value: "snippet"),
+                URLQueryItem(name: "channelId", value: "UCu2Fxqf37DAZ0ZhIsd1FZwA"),
+                URLQueryItem(name: "eventType", value: "live"),
+                URLQueryItem(name: "type", value: "video"),
+                URLQueryItem(name: "key", value: "IzaSyB1nlErMhG9T89Rr7HiPf5ZyUnNdDzCIwQ")]
+         
             return try await withCheckedThrowingContinuation { continuation in
                 AF.request(urlString, method: .get)
                     .responseData { response in

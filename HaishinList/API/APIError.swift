@@ -11,6 +11,7 @@ import Foundation
     case invalidURL
     case invalidResponse(Error)
     case decodingError(Error)
+     case invalidData
     case unknown(Error)
     
 }
@@ -20,6 +21,7 @@ extension APIError {
         case (.invalidURL, .invalidURL),
              (.invalidResponse, .invalidResponse),
              (.decodingError, .decodingError),
+            (.invalidData, .invalidData),
              (.unknown, .unknown):
             return true
         default:
@@ -32,6 +34,7 @@ extension APIError {
         case .invalidResponse(let error): return "無効なレスポンスです。\(error)"
         case .invalidURL: return "無効なURLです。"
         case .decodingError(let error): return "デコード失敗しました\(error)"
+        case .invalidData: return "無効なデータです。"
         case .unknown(let error): return "予期せぬエラーが発生しました。\(error)"
         }
     }

@@ -1,4 +1,4 @@
-import Alamofire
+
 //
 //  Twitch.swift
 //  HaishinList
@@ -8,6 +8,7 @@ import Alamofire
 import Combine
 import ComposableArchitecture
 import Foundation
+import Alamofire
 
 struct TwitchAPIClient {
     let accessToken = "36f8wvix1lupsvy8q6wlab9w6dll5"
@@ -20,18 +21,19 @@ struct TwitchAPIClient {
 extension TwitchAPIClient {
     static let live = Self(
         fetchMovie: {
+            let env = try! LoadEnv()
             var url = URLComponents()
             url.scheme = "https"
             url.host = "api.twitch.tv"
             url.path = "/helix/streams"
             url.queryItems = [
-                URLQueryItem(name: "user_id", value:  "501418327"),]
+                URLQueryItem(name: "user_id", value:  "44525650"),]
          
             let headers: HTTPHeaders = [
-                "Authorization": "Bearer 2ebbs1l05ii5zbfq1i0g4pacvhxrdc",
+                "Authorization": "Bearer \(env.value("TWITCH_ACCESS_TOKEN")!)",
                 "Client-Id": "k1p1y8bhkrjvps84wlodei5fe67696",
             ]
-
+            print(env.value("TWITCH_ACCESS_TOKEN")!)
             return try await withCheckedThrowingContinuation { continuation in
                 AF.request(url, method: .get, headers: headers)
                     .responseData { response in
@@ -41,7 +43,9 @@ extension TwitchAPIClient {
                         switch response.result {
                         case .success(let data):
                             do {
-
+                                if let jsonString = String(data: data, encoding: .utf8) {
+                                                   print("Received Error Response: \(jsonString)")
+                                               }
                                 let decoder = JSONDecoder()
                                 let twitchResponse = try decoder.decode(
                                     TwitchResponse.self, from: data)
@@ -69,6 +73,7 @@ extension TwitchAPIClient {
                                 }
                                 
                             } catch {
+                            
                                 print("デコード失敗:", error.localizedDescription)
                                 continuation.resume(
                                     throwing: APIError.decodingError(error))

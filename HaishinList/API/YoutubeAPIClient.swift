@@ -15,16 +15,17 @@ struct YoutubeAPIClient {
 extension YoutubeAPIClient {
     static let live = Self(
         fetchMovie: {
+            let env = try! LoadEnv()
             var urlString = URLComponents()
             urlString.scheme = "https"
             urlString.host = "www.googleapis.com"
             urlString.path = "/youtube/v3/search"
             urlString.queryItems = [
                 URLQueryItem(name: "part", value: "snippet"),
-                URLQueryItem(name: "channelId", value: "UCuWoH9mx0EgT69UyVxaw1NQ"),
+                URLQueryItem(name: "channelId", value: "UCY_10f4ef0e1T2skAbHBQTg"),
                 URLQueryItem(name: "eventType", value: "live"),
                 URLQueryItem(name: "type", value: "video"),
-                URLQueryItem(name: "key", value: "AIzaSyB1nlErMhG9T89Rr7HiPf5ZyUnNdDzCIwQ")]
+                URLQueryItem(name: "key", value: "\(env.value("YOUTUBE_API_KEY")!)")]
          
             return try await withCheckedThrowingContinuation { continuation in
                 AF.request(urlString, method: .get)
@@ -39,8 +40,7 @@ extension YoutubeAPIClient {
                                 if let jsonString = String(data: data, encoding: .utf8) {
                                                    print("Received Error Response: \(jsonString)")
                                                }
-                                
-
+    
                                 let decoder = JSONDecoder()
                                 let youtubeResponse = try decoder.decode(
                                     YoutubeResponse.self, from: data)
@@ -55,8 +55,14 @@ extension YoutubeAPIClient {
                                     )
 
                                 }
-                                print("成功！", movies)
-                                continuation.resume(returning: movies.first!)
+                                if movies.isEmpty{
+                                    continuation.resume(
+                                        throwing: APIError.invalidData
+                                    )
+                                }else{
+                                    continuation.resume(returning: movies.first!)
+                                }
+                                
                             } catch {
                                 print("デコード失敗:", error.localizedDescription)
                                 continuation.resume(

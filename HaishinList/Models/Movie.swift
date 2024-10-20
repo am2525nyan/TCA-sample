@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct Movie: Equatable, Codable{
+struct Movie: Equatable, Codable, Identifiable{
+    var id = UUID()
+    
     let title: String
     let name: String
     let thumbnailUrl: String

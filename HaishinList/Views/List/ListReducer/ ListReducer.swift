@@ -31,6 +31,7 @@ struct ListReducer {
         var youtubeMovie: YoutubeMovie? = nil
         var isLoading: Bool = false
         var errorMessage: String? = nil
+        var movies: [Movie] = []
     }
 
     enum Action {
@@ -61,7 +62,8 @@ struct ListReducer {
             case let .fetchTwitchMoviesResponse(.success(movie)):
                 state.isLoading = false
                 state.twitchMovie = movie
-                
+                let movie = Movie(title: state.twitchMovie?.title ?? "", name: state.twitchMovie?.name ?? "", thumbnailUrl: state.twitchMovie?.thumbnailUrl ?? "", streamUrl: state.twitchMovie?.streamUrl ?? "")
+                state.movies.append(movie)
                 return .none
 
             case let .fetchTwitchMoviesResponse(.failure(error)):
@@ -72,6 +74,8 @@ struct ListReducer {
             case let .fetchYoutubeMoviesResponse(.success(movie)):
                 state.isLoading = false
                 state.youtubeMovie = movie
+                let movie = Movie(title: state.youtubeMovie?.title ?? "", name: state.youtubeMovie?.name ?? "", thumbnailUrl: state.youtubeMovie?.thumbnailUrl ?? "", streamUrl: state.youtubeMovie?.streamUrl ?? "")
+                state.movies.append(movie)
                 return .none
 
             case let .fetchYoutubeMoviesResponse(.failure(error)):

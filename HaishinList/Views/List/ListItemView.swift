@@ -13,24 +13,29 @@ struct ListItemView: View {
     @Environment(\.openURL) private var openURL
     var body: some View {
         VStack{
-            if store.twitchMovie != nil{
-                AsyncImage(url: URL(string: store.twitchMovie?.thumbnailUrl ?? "https://pbs.twimg.com/media/GZmQiNIboAEfQHL?format=jpg&name=large")){ image in
+            if store.movies != nil{
+                List{
                     
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .onTapGesture {
-                            openURL(URL(string: store.twitchMovie?.streamUrl ?? "https://x.com/home")!)
+                    ForEach(store.movies){ movie in
+                        AsyncImage(url: URL(string: movie.thumbnailUrl)){ image in
+                            
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .onTapGesture {
+                                    openURL(URL(string: movie.streamUrl)!)
+                                }
+                        } placeholder: {
+                            ProgressView()
                         }
-                } placeholder: {
-                    ProgressView()
+                        .padding(.bottom,10)
+                        
+                        Text(movie.title)
+                            .padding(.bottom, 4)
+                        Text(movie.name)
+                            .padding(.bottom, 10)
+                    }
                 }
-                .padding(.bottom,10)
-         
-            Text(store.twitchMovie?.title ?? "取得失敗しました")
-                .padding(.bottom, 4)
-                Text(store.twitchMovie?.name ?? "取得失敗しました")
-                .padding(.bottom, 10)
             }
             Button("取得する"){
                 store.send(.fetchMovies,animation: .default)

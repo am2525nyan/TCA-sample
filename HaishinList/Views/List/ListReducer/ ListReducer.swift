@@ -61,6 +61,7 @@ struct ListReducer {
             case let .fetchTwitchMoviesResponse(.success(movie)):
                 state.isLoading = false
                 state.twitchMovie = movie
+                
                 return .none
 
             case let .fetchTwitchMoviesResponse(.failure(error)):

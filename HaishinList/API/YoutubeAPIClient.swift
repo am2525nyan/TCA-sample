@@ -24,7 +24,7 @@ extension YoutubeAPIClient {
                 URLQueryItem(name: "channelId", value: "UCuWoH9mx0EgT69UyVxaw1NQ"),
                 URLQueryItem(name: "eventType", value: "live"),
                 URLQueryItem(name: "type", value: "video"),
-                URLQueryItem(name: "key", value: "IzaSyB1nlErMhG9T89Rr7HiPf5ZyUnNdDzCIwQ")]
+                URLQueryItem(name: "key", value: "AIzaSyB1nlErMhG9T89Rr7HiPf5ZyUnNdDzCIwQ")]
          
             return try await withCheckedThrowingContinuation { continuation in
                 AF.request(urlString, method: .get)
@@ -36,6 +36,10 @@ extension YoutubeAPIClient {
                         switch response.result {
                         case .success(let data):
                             do {
+                                if let jsonString = String(data: data, encoding: .utf8) {
+                                                   print("Received Error Response: \(jsonString)")
+                                               }
+                                
 
                                 let decoder = JSONDecoder()
                                 let youtubeResponse = try decoder.decode(

@@ -11,10 +11,12 @@
 		72323E022CB50C79000EF314 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 72323E012CB50C79000EF314 /* Alamofire */; };
 		72323E0D2CB54770000EF314 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 72323E0C2CB54770000EF314 /* GoogleSignIn */; };
 		72323E0F2CB54770000EF314 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 72323E0E2CB54770000EF314 /* GoogleSignInSwift */; };
+		72849ABE2CC52B72005FE1B6 /* .env in Resources */ = {isa = PBXBuildFile; fileRef = 72849AAA2CC52B72005FE1B6 /* .env */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		72323DDA2CB4ECBE000EF314 /* HaishinList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HaishinList.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		72849AAA2CC52B72005FE1B6 /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,6 +58,7 @@
 		72323DD12CB4ECBE000EF314 = {
 			isa = PBXGroup;
 			children = (
+				72849AAA2CC52B72005FE1B6 /* .env */,
 				72323DDC2CB4ECBE000EF314 /* HaishinList */,
 				72323DDB2CB4ECBE000EF314 /* Products */,
 			);
@@ -142,6 +145,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72849ABE2CC52B72005FE1B6 /* .env in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

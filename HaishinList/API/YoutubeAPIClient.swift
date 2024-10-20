@@ -21,7 +21,7 @@ extension YoutubeAPIClient {
             urlString.path = "/youtube/v3/search"
             urlString.queryItems = [
                 URLQueryItem(name: "part", value: "snippet"),
-                URLQueryItem(name: "channelId", value: "UCu2Fxqf37DAZ0ZhIsd1FZwA"),
+                URLQueryItem(name: "channelId", value: "UCuWoH9mx0EgT69UyVxaw1NQ"),
                 URLQueryItem(name: "eventType", value: "live"),
                 URLQueryItem(name: "type", value: "video"),
                 URLQueryItem(name: "key", value: "IzaSyB1nlErMhG9T89Rr7HiPf5ZyUnNdDzCIwQ")]

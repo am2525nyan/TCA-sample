@@ -11,9 +11,7 @@ import Foundation
 import Alamofire
 
 struct TwitchAPIClient {
-    let accessToken = "36f8wvix1lupsvy8q6wlab9w6dll5"
-    let clientId = "k1p1y8bhkrjvps84wlodei5fe67696"
-    let userId = "136255354"
+
     var fetchMovie: () async throws -> TwitchMovie
 
 }

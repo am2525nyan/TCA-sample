@@ -49,6 +49,12 @@ extension YoutubeAPIClient {
                             switch response.result {
                             case .success(let data):
                                 do {
+                                    if let jsonString = String(
+                                        data: data, encoding: .utf8)
+                                    {
+                                        print(
+                                            "Received Response: \(jsonString)")
+                                    }
                                     let decoder = JSONDecoder()
                                     let youtubeResponse = try decoder.decode(YoutubeResponse.self, from: data)
                                     let movies = youtubeResponse.items.map { streamData in
@@ -56,7 +62,7 @@ extension YoutubeAPIClient {
                                             title: streamData.snippet.title,
                                             name: streamData.snippet.channelTitle,
                                             videoId: streamData.id.videoId,
-                                            thumbnailUrl: streamData.snippet.thumbnails.high.url
+                                            thumbnailUrl: streamData.snippet.thumbnails.high.url, publishedAt: streamData.snippet.publishedAt
                                         )
                                     }
                                     allMovies.append(contentsOf: movies)

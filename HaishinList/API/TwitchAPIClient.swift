@@ -71,11 +71,11 @@ extension TwitchAPIClient {
                                                 .replacingOccurrences(
                                                     of: "{width}x{height}",
                                                     with: "1920x1080"),
-                                            userLogin: streamData.user_login
+                                            userLogin: streamData.user_login, publishedAt: streamData.started_at
                                         )
                                     }
 
-                                    allMovies.append(contentsOf: movies)  // 全ての結果を追加
+                                    allMovies.append(contentsOf: movies)
                                 } catch {
                                     print("デコード失敗:", error.localizedDescription)
                                 }
@@ -102,6 +102,7 @@ struct TwitchStreamData: Decodable {
     let user_name: String
     let thumbnail_url: String
     let user_login: String
+    let started_at: String
 }
 
 struct TwitchResponse: Decodable {

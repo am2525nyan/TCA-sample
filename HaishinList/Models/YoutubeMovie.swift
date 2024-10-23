@@ -13,12 +13,14 @@ struct YoutubeMovie: Equatable, Decodable {
     let videoId: String
     let thumbnailUrl: String
     let streamUrl: String
-    init(title: String, name: String, videoId: String, thumbnailUrl: String) {
+    let publishedAt: String
+    init(title: String, name: String, videoId: String, thumbnailUrl: String, publishedAt: String) {
         self.title = title
         self.name = name
         self.thumbnailUrl = thumbnailUrl
         self.videoId = videoId
         self.streamUrl = "https://www.youtube.com/watch?v=\(videoId)"
+        self.publishedAt = publishedAt
     }
     enum CodingKeys: String,CodingKey {
         case title = "title"
@@ -26,6 +28,7 @@ struct YoutubeMovie: Equatable, Decodable {
         case videoId = "videoId"
         case thumbnailUrl = "thumbnail_url"
         case streamUrl = "videoURL"
+        case publishedAt = "publishedAt"
      
     }
 }

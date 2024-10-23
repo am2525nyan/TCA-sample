@@ -13,13 +13,15 @@ struct TwitchMovie: Codable,Equatable {
     let thumbnailUrl: String
     let streamUrl: String
     let userLogin: String
+    let publishedAt: String
     
-    init(title: String, user_name: String, thumbnailUrl: String,userLogin: String) {
+    init(title: String, user_name: String, thumbnailUrl: String,userLogin: String, publishedAt: String) {
         self.title = title
         self.name = user_name
         self.thumbnailUrl = thumbnailUrl
         self.userLogin = userLogin
         self.streamUrl = "https://www.twitch.tv/\(userLogin)"
+        self.publishedAt = publishedAt
         
     }
     enum CodingKeys: String,CodingKey {
@@ -28,6 +30,7 @@ struct TwitchMovie: Codable,Equatable {
         case thumbnailUrl = "thumbnail_url"
         case streamUrl = "stream_url"
         case userLogin = "user_login"
+        case publishedAt = "published_at"
     }
  
 }

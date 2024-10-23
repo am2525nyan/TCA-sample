@@ -46,6 +46,9 @@ struct ListReducer {
             case .fetchMovies:
                 state.isLoading = true
                 state.errorMessage = nil
+                state.movies = []
+                state.youtubeMovie = []
+                state.twitchMovies = []
                 return .run { send in
                     await send(
                         .fetchTwitchMoviesResponse(
@@ -68,7 +71,7 @@ struct ListReducer {
                         title: twitchMovie.title,
                         name: twitchMovie.name,
                         thumbnailUrl: twitchMovie.thumbnailUrl,
-                        streamUrl: twitchMovie.streamUrl
+                        streamUrl: twitchMovie.streamUrl, publishedAt: twitchMovie.publishedAt
                     )
 
                     state.movies.append(movie)
@@ -89,7 +92,7 @@ struct ListReducer {
                         title: youtubeMovie.title,
                         name: youtubeMovie.name,
                         thumbnailUrl: youtubeMovie.thumbnailUrl,
-                        streamUrl: youtubeMovie.streamUrl)
+                        streamUrl: youtubeMovie.streamUrl, publishedAt: youtubeMovie.publishedAt)
                     state.movies.append(movie)
                 }
 

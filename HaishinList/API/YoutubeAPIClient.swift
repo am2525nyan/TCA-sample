@@ -4,89 +4,82 @@
 //
 //  Created by saki on 2024/10/08.
 //
-
 import Alamofire
 import ComposableArchitecture
 import Foundation
 
 struct YoutubeAPIClient {
-    var fetchMovie: () async throws -> YoutubeMovie
+    var fetchMovies: () async throws -> [YoutubeMovie]
 }
+
 extension YoutubeAPIClient {
     static let live = Self(
-        fetchMovie: {
+        fetchMovies: {
             let env = try! LoadEnv()
             var urlString = URLComponents()
             urlString.scheme = "https"
             urlString.host = "www.googleapis.com"
             urlString.path = "/youtube/v3/search"
-            urlString.queryItems = [
-                URLQueryItem(name: "part", value: "snippet"),
-                URLQueryItem(
-                    name: "channelId", value: "UCL34fAoFim9oHLbVzMKFavQ"),
-                URLQueryItem(name: "eventType", value: "live"),
-                URLQueryItem(name: "type", value: "video"),
-                URLQueryItem(
-                    name: "key", value: "\(env.value("YOUTUBE_API_KEY")!)"),
-            ]
+            
+            let channelIds = ["UCPkKpOHxEDcwmUAnRpIu-Ng", "UCfipDDn7wY-C-SoUChgxCQQ"] 
+            
+            var allMovies: [YoutubeMovie] = []
+            let group = DispatchGroup()
 
             return try await withCheckedThrowingContinuation { continuation in
-                AF.request(urlString, method: .get)
-                    .responseData { response in
-                        if let statusCode = response.response?.statusCode {
-                            print("Status Code: \(statusCode)")
-                        }
-                        print(response.result)
-                        switch response.result {
-                        case .success(let data):
-                            do {
-                                if let jsonString = String(
-                                    data: data, encoding: .utf8)
-                                {
-                                    print(
-                                        "Received Error Response: \(jsonString)"
-                                    )
-                                }
+                for channelId in channelIds {
+                    group.enter()
 
-                                let decoder = JSONDecoder()
-                                let youtubeResponse = try decoder.decode(
-                                    YoutubeResponse.self, from: data)
-                                print(youtubeResponse, "youtube")
-                                let movies = youtubeResponse.items.map {
-                                    streamData in
-                                    YoutubeMovie(
-                                        title: streamData.snippet.title,
-                                        name: streamData.snippet.channelTitle,
-                                        videoId: streamData.id.videoId,
-                                        thumbnailUrl: streamData.snippet
-                                            .thumbnails.high.url
-                                    )
+                    urlString.queryItems = [
+                        URLQueryItem(name: "part", value: "snippet"),
+                        URLQueryItem(name: "channelId", value: channelId),
+                        URLQueryItem(name: "eventType", value: "live"),
+                        URLQueryItem(name: "type", value: "video"),
+                        URLQueryItem(name: "key", value: "\(env.value("YOUTUBE_API_KEY")!)")
+                    ]
 
-                                }
-                                if movies.isEmpty {
-                                    continuation.resume(
-                                        throwing: APIError.invalidData
-                                    )
-                                } else {
-                                    continuation.resume(
-                                        returning: movies.first!)
-                                }
+                    AF.request(urlString, method: .get)
+                        .responseData { response in
+                            defer { group.leave() }
 
-                            } catch {
-                                print("デコード失敗:", error.localizedDescription)
-                                continuation.resume(
-                                    throwing: APIError.decodingError(error))
+                            if let statusCode = response.response?.statusCode {
+                                print("Status Code: \(statusCode)")
                             }
 
-                        case .failure(let error):
-                            print("失敗！", error.localizedDescription)
-                            continuation.resume(
-                                throwing: APIError.invalidResponse(error))
-                        }
-                    }
-            }
+                            switch response.result {
+                            case .success(let data):
+                                do {
+                                    let decoder = JSONDecoder()
+                                    let youtubeResponse = try decoder.decode(YoutubeResponse.self, from: data)
+                                    let movies = youtubeResponse.items.map { streamData in
+                                        YoutubeMovie(
+                                            title: streamData.snippet.title,
+                                            name: streamData.snippet.channelTitle,
+                                            videoId: streamData.id.videoId,
+                                            thumbnailUrl: streamData.snippet.thumbnails.high.url
+                                        )
+                                    }
+                                    allMovies.append(contentsOf: movies)
 
-        })
+                                } catch {
+                                    print("デコード失敗:", error.localizedDescription)
+                                }
+                            case .failure(let error):
+                                print("失敗！", error.localizedDescription)
+                            }
+                        }
+                }
+
+                group.notify(queue: .main) {
+                    if allMovies.isEmpty {
+                        continuation.resume(throwing: APIError.invalidData)
+                    } else {
+                        continuation.resume(returning: allMovies)
+                    }
+                }
+            }
+        }
+    )
 }
 
 struct YoutubeResponse: Decodable {

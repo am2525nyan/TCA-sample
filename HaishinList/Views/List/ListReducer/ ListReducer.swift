@@ -28,7 +28,7 @@ struct ListReducer {
     @ObservableState
     struct State {
         var twitchMovies: [TwitchMovie]? = []
-        var youtubeMovie: YoutubeMovie? = nil
+        var youtubeMovie: [YoutubeMovie]? = []
         var isLoading: Bool = false
         var errorMessage: String? = nil
         var movies: [Movie] = []
@@ -37,7 +37,7 @@ struct ListReducer {
     enum Action {
         case fetchMovies
         case fetchTwitchMoviesResponse(TaskResult<[TwitchMovie]>)
-        case fetchYoutubeMoviesResponse(TaskResult<YoutubeMovie>)
+        case fetchYoutubeMoviesResponse(TaskResult<[YoutubeMovie]>)
     }
 
     var body: some ReducerOf<Self> {
@@ -55,7 +55,7 @@ struct ListReducer {
                     await send(
                         .fetchYoutubeMoviesResponse(
                             TaskResult {
-                                try await self.youtubeAPIClient.fetchMovie()
+                                try await self.youtubeAPIClient.fetchMovies()
                             }))
                 }
 
@@ -81,15 +81,18 @@ struct ListReducer {
                 state.errorMessage = error.localizedDescription
                 return .none
 
-            case let .fetchYoutubeMoviesResponse(.success(movie)):
+            case let .fetchYoutubeMoviesResponse(.success(movies)):
                 state.isLoading = false
-                state.youtubeMovie = movie
-                let movie = Movie(
-                    title: state.youtubeMovie?.title ?? "",
-                    name: state.youtubeMovie?.name ?? "",
-                    thumbnailUrl: state.youtubeMovie?.thumbnailUrl ?? "",
-                    streamUrl: state.youtubeMovie?.streamUrl ?? "")
-                state.movies.append(movie)
+                state.youtubeMovie = movies
+                for youtubeMovie in movies {
+                    let movie = Movie(
+                        title: youtubeMovie.title,
+                        name: youtubeMovie.name,
+                        thumbnailUrl: youtubeMovie.thumbnailUrl,
+                        streamUrl: youtubeMovie.streamUrl)
+                    state.movies.append(movie)
+                }
+
                 return .none
 
             case let .fetchYoutubeMoviesResponse(.failure(error)):

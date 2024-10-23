@@ -27,7 +27,7 @@ struct ListReducer {
 
     @ObservableState
     struct State {
-        var twitchMovie: TwitchMovie? = nil
+        var twitchMovies: [TwitchMovie]? = []
         var youtubeMovie: YoutubeMovie? = nil
         var isLoading: Bool = false
         var errorMessage: String? = nil
@@ -36,7 +36,7 @@ struct ListReducer {
 
     enum Action {
         case fetchMovies
-        case fetchTwitchMoviesResponse(TaskResult<TwitchMovie>)
+        case fetchTwitchMoviesResponse(TaskResult<[TwitchMovie]>)
         case fetchYoutubeMoviesResponse(TaskResult<YoutubeMovie>)
     }
 
@@ -59,22 +59,36 @@ struct ListReducer {
                             }))
                 }
 
-            case let .fetchTwitchMoviesResponse(.success(movie)):
+            case let .fetchTwitchMoviesResponse(.success(movies)):
                 state.isLoading = false
-                state.twitchMovie = movie
-                let movie = Movie(title: state.twitchMovie?.title ?? "", name: state.twitchMovie?.name ?? "", thumbnailUrl: state.twitchMovie?.thumbnailUrl ?? "", streamUrl: state.twitchMovie?.streamUrl ?? "")
-                state.movies.append(movie)
-                return .none
+                state.twitchMovies = movies  // 複数の映画データを格納
+                print(movies, "a")
+                for twitchMovie in movies {
+                    let movie = Movie(
+                        title: twitchMovie.title,
+                        name: twitchMovie.name,
+                        thumbnailUrl: twitchMovie.thumbnailUrl,
+                        streamUrl: twitchMovie.streamUrl
+                    )
 
+                    state.movies.append(movie)
+                    print(movie)
+                }
+
+                return .none
             case let .fetchTwitchMoviesResponse(.failure(error)):
                 state.isLoading = false
                 state.errorMessage = error.localizedDescription
                 return .none
-         
+
             case let .fetchYoutubeMoviesResponse(.success(movie)):
                 state.isLoading = false
                 state.youtubeMovie = movie
-                let movie = Movie(title: state.youtubeMovie?.title ?? "", name: state.youtubeMovie?.name ?? "", thumbnailUrl: state.youtubeMovie?.thumbnailUrl ?? "", streamUrl: state.youtubeMovie?.streamUrl ?? "")
+                let movie = Movie(
+                    title: state.youtubeMovie?.title ?? "",
+                    name: state.youtubeMovie?.name ?? "",
+                    thumbnailUrl: state.youtubeMovie?.thumbnailUrl ?? "",
+                    streamUrl: state.youtubeMovie?.streamUrl ?? "")
                 state.movies.append(movie)
                 return .none
 

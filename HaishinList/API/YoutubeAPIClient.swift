@@ -22,11 +22,14 @@ extension YoutubeAPIClient {
             urlString.path = "/youtube/v3/search"
             urlString.queryItems = [
                 URLQueryItem(name: "part", value: "snippet"),
-                URLQueryItem(name: "channelId", value: "UCY_10f4ef0e1T2skAbHBQTg"),
+                URLQueryItem(
+                    name: "channelId", value: "UCL34fAoFim9oHLbVzMKFavQ"),
                 URLQueryItem(name: "eventType", value: "live"),
                 URLQueryItem(name: "type", value: "video"),
-                URLQueryItem(name: "key", value: "\(env.value("YOUTUBE_API_KEY")!)")]
-         
+                URLQueryItem(
+                    name: "key", value: "\(env.value("YOUTUBE_API_KEY")!)"),
+            ]
+
             return try await withCheckedThrowingContinuation { continuation in
                 AF.request(urlString, method: .get)
                     .responseData { response in
@@ -37,10 +40,14 @@ extension YoutubeAPIClient {
                         switch response.result {
                         case .success(let data):
                             do {
-                                if let jsonString = String(data: data, encoding: .utf8) {
-                                                   print("Received Error Response: \(jsonString)")
-                                               }
-    
+                                if let jsonString = String(
+                                    data: data, encoding: .utf8)
+                                {
+                                    print(
+                                        "Received Error Response: \(jsonString)"
+                                    )
+                                }
+
                                 let decoder = JSONDecoder()
                                 let youtubeResponse = try decoder.decode(
                                     YoutubeResponse.self, from: data)
@@ -49,20 +56,22 @@ extension YoutubeAPIClient {
                                     streamData in
                                     YoutubeMovie(
                                         title: streamData.snippet.title,
-                                        name: streamData.snippet.channelTitle, videoId: streamData.id.videoId,
+                                        name: streamData.snippet.channelTitle,
+                                        videoId: streamData.id.videoId,
                                         thumbnailUrl: streamData.snippet
                                             .thumbnails.high.url
                                     )
 
                                 }
-                                if movies.isEmpty{
+                                if movies.isEmpty {
                                     continuation.resume(
                                         throwing: APIError.invalidData
                                     )
-                                }else{
-                                    continuation.resume(returning: movies.first!)
+                                } else {
+                                    continuation.resume(
+                                        returning: movies.first!)
                                 }
-                                
+
                             } catch {
                                 print("デコード失敗:", error.localizedDescription)
                                 continuation.resume(

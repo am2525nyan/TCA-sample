@@ -13,7 +13,7 @@ struct YoutubeAPIClient {
 }
 
 extension YoutubeAPIClient {
-    static let live = Self(
+    static let live = YoutubeAPIClient(
         fetchMovies: {
             let env = try! LoadEnv()
             var urlString = URLComponents()

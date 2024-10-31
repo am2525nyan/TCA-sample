@@ -12,20 +12,20 @@ import Foundation
 struct ListReducer {
     @Dependency(\.twitchAPIClient) var twitchAPIClient
     @Dependency(\.youtubeAPIClient) var youtubeAPIClient
-    @ObservableState
+
     struct Environment {
-        var twitchAPIClient: TwitchAPIClient
-        var youtubeAPIClient: YoutubeAPIClient
+        var twitchAPIClient: TwitchAPIClientProtocol
+        var youtubeAPIClient: YoutubeAPIClientProtocol
         var mainQueue: AnySchedulerOf<DispatchQueue>
 
         static let live = Self(
-            twitchAPIClient: .live,
+            twitchAPIClient: TwitchAPIClient.shared,
             youtubeAPIClient: YoutubeAPIClient.shared,
             mainQueue: .main
         )
         static let mock = Self(
-            twitchAPIClient: .mock,
-            youtubeAPIClient: .shared,
+            twitchAPIClient: MockTwitchAPIClient.shared,
+            youtubeAPIClient: MockYoutubeAPIClient.shared,
             mainQueue: .main
         )
     }
@@ -119,7 +119,7 @@ struct ListReducer {
 }
 
 private enum TwitchAPIClientKey: DependencyKey {
-    static let liveValue = TwitchAPIClient.live
+    static let liveValue = TwitchAPIClient.shared
 
 }
 private enum YoutubeAPIClientKey: DependencyKey {
@@ -127,7 +127,12 @@ private enum YoutubeAPIClientKey: DependencyKey {
 
 }
 private enum TwitchAPICientTestKey: TestDependencyKey {
-    static var testValue = TwitchAPIClient.mock
+    static var testValue = MockTwitchAPIClient.shared
+
+}
+
+private enum YoutubeAPICientTestKey: TestDependencyKey {
+    static var testValue = MockYoutubeAPIClient.shared
 
 }
 

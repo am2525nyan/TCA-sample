@@ -1,87 +1,81 @@
-import Alamofire
 //
 //  Twitch.swift
 //  HaishinList
 //
 //  Created by saki on 2024/10/09.
 //
+import Alamofire
 import Combine
 import ComposableArchitecture
 import Foundation
 
-struct TwitchAPIClient {
-    var fetchMovies: () async throws -> [TwitchMovie]
-
+final class TwitchAPIClient: TwitchAPIClientProtocol {
+    static let shared = TwitchAPIClient()
+    private init() {
+    }
 }
 
 extension TwitchAPIClient {
-    static let live = Self(
-        fetchMovies: {
-            let env = try! LoadEnv()
-            var url = URLComponents()
-            url.scheme = "https"
-            url.host = "api.twitch.tv"
-            url.path = "/helix/streams"
 
-            let headers: HTTPHeaders = [
-                "Authorization": "Bearer \(env.value("TWITCH_ACCESS_TOKEN")!)",
-                "Client-Id": "k1p1y8bhkrjvps84wlodei5fe67696",
+    func fetchMovies() async throws -> [TwitchMovie] {
+
+        let env = try! LoadEnv()
+        var url = URLComponents()
+        url.scheme = "https"
+        url.host = "api.twitch.tv"
+        url.path = "/helix/streams"
+
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer \(env.value("TWITCH_ACCESS_TOKEN")!)",
+            "Client-Id": "k1p1y8bhkrjvps84wlodei5fe67696",
+        ]
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let twitchUserIds = [
+                "44525650", "598495509", "161835870", "113028874",
+                "805456112", "524474488", "25233449",
             ]
+            var allMovies: [TwitchMovie] = []
+            let group = DispatchGroup()
 
-            return try await withCheckedThrowingContinuation { continuation in
-                let twitchUserIds = [
-                    "44525650", "598495509", "161835870", "113028874",
-                    "805456112", "524474488", "25233449",
+            for channelId in twitchUserIds {
+                group.enter()
+
+                url.queryItems = [
+                    URLQueryItem(name: "user_id", value: channelId)
                 ]
-                var allMovies: [TwitchMovie] = []
-                let group = DispatchGroup()
 
-                for channelId in twitchUserIds {
-                    group.enter()
+                AF.request(url, method: .get, headers: headers)
+                    .responseData { response in
+                        defer { group.leave() }
 
-                    url.queryItems = [
-                        URLQueryItem(name: "user_id", value: channelId)
-                    ]
-
-                    AF.request(url, method: .get, headers: headers)
-                        .responseData { response in
-                            defer { group.leave() }
-
-                            if let statusCode = response.response?.statusCode {
-                                print("Twitch Status Code: \(statusCode)")
-                            }
-                            switch response.result {
-                            case .success(let data):
-                              let decodeMovies = decodeResponseData(data: data)
-
-                                allMovies.append(contentsOf: decodeMovies)
-                            
-                            case .failure(let error):
-                                print("リクエスト失敗！", error.localizedDescription)
-                            }
+                        if let statusCode = response.response?.statusCode {
+                            print("Twitch Status Code: \(statusCode)")
                         }
-                }
+                        switch response.result {
+                        case .success(let data):
+                            let decodeMovies =
+                                TwitchAPIClient.decodeResponseData(data: data)
 
-                group.notify(queue: .main) {
-                    if allMovies.isEmpty {
-                        print("誰も配信してません！")
-                        continuation.resume(throwing: APIError.invalidData)
-                    } else {
-                        continuation.resume(returning: allMovies)
+                            allMovies.append(contentsOf: decodeMovies)
+
+                        case .failure(let error):
+                            print("リクエスト失敗！", error.localizedDescription)
+                        }
                     }
+            }
+
+            group.notify(queue: .main) {
+                if allMovies.isEmpty {
+                    print("誰も配信してません！")
+                    continuation.resume(throwing: APIError.invalidData)
+                } else {
+                    continuation.resume(returning: allMovies)
                 }
             }
         }
-    )
-    static let mock = Self {
-        let mockData: [TwitchMovie] = [
-            TwitchMovie(
-                title: "テストタイトル", user_name: "テストさん",
-                thumbnailUrl: "https://x.com/am2525nyan", userLogin: "saki",
-                publishedAt: "2024-10-23T01:46:59Z")
-        ]
-        return mockData
     }
+
     static func decodeResponseData(data: Data) -> [TwitchMovie] {
         do {
             print("レスポンス:", String(data: data, encoding: .utf8) ?? "No data")
@@ -111,7 +105,6 @@ extension TwitchAPIClient {
         }
 
     }
-    
 
 }
 

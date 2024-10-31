@@ -20,12 +20,12 @@ struct ListReducer {
 
         static let live = Self(
             twitchAPIClient: .live,
-            youtubeAPIClient: .live,
+            youtubeAPIClient: YoutubeAPIClient.shared,
             mainQueue: .main
         )
         static let mock = Self(
             twitchAPIClient: .mock,
-            youtubeAPIClient: .live,
+            youtubeAPIClient: .shared,
             mainQueue: .main
         )
     }
@@ -123,7 +123,7 @@ private enum TwitchAPIClientKey: DependencyKey {
 
 }
 private enum YoutubeAPIClientKey: DependencyKey {
-    static let liveValue = YoutubeAPIClient.live
+    static let liveValue = YoutubeAPIClient.shared
 
 }
 private enum TwitchAPICientTestKey: TestDependencyKey {

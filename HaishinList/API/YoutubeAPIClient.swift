@@ -8,89 +8,84 @@ import Alamofire
 import ComposableArchitecture
 import Foundation
 
-struct YoutubeAPIClient {
-    var fetchMovies: () async throws -> [YoutubeMovie]
+final class YoutubeAPIClient: YoutubeAPIClientProtocol {
+    
+    static let shared = YoutubeAPIClient()
+
+      private init() {}
+    
 }
 
 extension YoutubeAPIClient {
-    static let live = YoutubeAPIClient(
-        fetchMovies: {
-            let env = try! LoadEnv()
-            var urlString = URLComponents()
-            urlString.scheme = "https"
-            urlString.host = "www.googleapis.com"
-            urlString.path = "/youtube/v3/search"
-
-            let channelIds = [
-                "UCPkKpOHxEDcwmUAnRpIu-Ng", "UCfipDDn7wY-C-SoUChgxCQQ",
-                "UCWQtYtq9EOB4-I5P-3fh8lA", "UCj4PjeVMnNTHIR5EeoNKPAw",
-                "UChLfthKoUV502J7gU9STArg", "UCZlDXzGoo7d44bwdNObFacg",
-            ]
-
-            var allMovies: [YoutubeMovie] = []
-            let group = DispatchGroup()
-
-            return try await withCheckedThrowingContinuation { continuation in
-                for channelId in channelIds {
-                    group.enter()
-
-                    urlString.queryItems = [
-                        URLQueryItem(name: "part", value: "snippet"),
-                        URLQueryItem(name: "channelId", value: channelId),
-                        URLQueryItem(name: "eventType", value: "live"),
-                        URLQueryItem(name: "type", value: "video"),
-                        URLQueryItem(
-                            name: "key",
-                            value: "\(env.value("YOUTUBE_API_KEY")!)"),
-                    ]
-
-                    AF.request(urlString, method: .get)
-                        .responseData { response in
-                            defer { group.leave() }
-
-                            if let statusCode = response.response?.statusCode {
-                                print("Youtube Status Code: \(statusCode)")
-                            }
-
-                            switch response.result {
-                            case .success(let data):
-                                do {
-                                    let movies =
-                                        try YoutubeAPIClient.decodeResponseData(
-                                            data: data)
-                                    allMovies.append(contentsOf: movies)
-
-                                } catch {
-                                    print("デコード失敗:", error.localizedDescription)
-                                    continuation.resume(
-                                        throwing: APIError.decodingError(error))
-                                }
-                            case .failure(let error):
-                                print("失敗！", error.localizedDescription)
-                                continuation.resume(
-                                    throwing: APIError.invalidResponse(error))
-                            }
+    func fetchMovies() async throws -> [YoutubeMovie] {
+        
+        let env = try! LoadEnv()
+        var urlString = URLComponents()
+        urlString.scheme = "https"
+        urlString.host = "www.googleapis.com"
+        urlString.path = "/youtube/v3/search"
+        
+        let channelIds = [
+            "UCPkKpOHxEDcwmUAnRpIu-Ng", "UCfipDDn7wY-C-SoUChgxCQQ",
+            "UCWQtYtq9EOB4-I5P-3fh8lA", "UCj4PjeVMnNTHIR5EeoNKPAw",
+            "UChLfthKoUV502J7gU9STArg", "UCZlDXzGoo7d44bwdNObFacg",
+        ]
+        
+        var allMovies: [YoutubeMovie] = []
+        let group = DispatchGroup()
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            for channelId in channelIds {
+                group.enter()
+                
+                urlString.queryItems = [
+                    URLQueryItem(name: "part", value: "snippet"),
+                    URLQueryItem(name: "channelId", value: channelId),
+                    URLQueryItem(name: "eventType", value: "live"),
+                    URLQueryItem(name: "type", value: "video"),
+                    URLQueryItem(
+                        name: "key",
+                        value: "\(env.value("YOUTUBE_API_KEY")!)"),
+                ]
+                
+                AF.request(urlString, method: .get)
+                    .responseData { response in
+                        defer { group.leave() }
+                        
+                        if let statusCode = response.response?.statusCode {
+                            print("Youtube Status Code: \(statusCode)")
                         }
-                }
-
-                group.notify(queue: .main) {
-                    if allMovies.isEmpty {
-                        continuation.resume(throwing: APIError.invalidData)
-                    } else {
-                        continuation.resume(returning: allMovies)
+                        
+                        switch response.result {
+                        case .success(let data):
+                            do {
+                                let movies =
+                                try YoutubeAPIClient.decodeResponseData(
+                                    data: data)
+                                allMovies.append(contentsOf: movies)
+                                
+                            } catch {
+                                print("デコード失敗:", error.localizedDescription)
+                                continuation.resume(
+                                    throwing: APIError.decodingError(error))
+                            }
+                        case .failure(let error):
+                            print("失敗！", error.localizedDescription)
+                            continuation.resume(
+                                throwing: APIError.invalidResponse(error))
+                        }
                     }
+            }
+            
+            group.notify(queue: .main) {
+                if allMovies.isEmpty {
+                    continuation.resume(throwing: APIError.invalidData)
+                } else {
+                    continuation.resume(returning: allMovies)
                 }
             }
         }
-    )
-    static var mock: [YoutubeMovie] = [
-        YoutubeMovie(
-            title: "テスト", name: "テストさん", videoId: "zuo7RdUUcmE",
-            thumbnailUrl:
-                "https://pbs.twimg.com/media/GZmQiNIboAEfQHL?format=jpg&name=large",
-            publishedAt: "2024-10-22T09:07:36Z")
-    ]
-
+    }
     static func decodeResponseData(data: Data) throws -> [YoutubeMovie] {
 
         let decoder = JSONDecoder()

@@ -49,7 +49,7 @@ extension YoutubeAPIClient {
                 ]
                 
                 AF.request(urlString, method: .get)
-                    .responseData { response in
+                    .responseData { [self] response in
                         defer { group.leave() }
                         
                         if let statusCode = response.response?.statusCode {
@@ -60,7 +60,7 @@ extension YoutubeAPIClient {
                         case .success(let data):
                             do {
                                 let movies =
-                                try YoutubeAPIClient.decodeResponseData(
+                                try decodeResponseData(
                                     data: data)
                                 allMovies.append(contentsOf: movies)
                                 
@@ -79,14 +79,14 @@ extension YoutubeAPIClient {
             
             group.notify(queue: .main) {
                 if allMovies.isEmpty {
-                    continuation.resume(throwing: APIError.invalidData)
+                    continuation.resume(returning: [])
                 } else {
                     continuation.resume(returning: allMovies)
                 }
             }
         }
     }
-    static func decodeResponseData(data: Data) throws -> [YoutubeMovie] {
+ func decodeResponseData(data: Data) throws -> [YoutubeMovie] {
 
         let decoder = JSONDecoder()
         let youtubeResponse = try decoder.decode(

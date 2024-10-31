@@ -46,7 +46,7 @@ extension TwitchAPIClient {
                 ]
 
                 AF.request(url, method: .get, headers: headers)
-                    .responseData { response in
+                    .responseData { [self] response in
                         defer { group.leave() }
 
                         if let statusCode = response.response?.statusCode {
@@ -55,7 +55,7 @@ extension TwitchAPIClient {
                         switch response.result {
                         case .success(let data):
                             let decodeMovies =
-                                TwitchAPIClient.decodeResponseData(data: data)
+                                decodeResponseData(data: data)
 
                             allMovies.append(contentsOf: decodeMovies)
 
@@ -68,7 +68,7 @@ extension TwitchAPIClient {
             group.notify(queue: .main) {
                 if allMovies.isEmpty {
                     print("誰も配信してません！")
-                    continuation.resume(throwing: APIError.invalidData)
+                    continuation.resume(returning: [])
                 } else {
                     continuation.resume(returning: allMovies)
                 }
@@ -76,7 +76,7 @@ extension TwitchAPIClient {
         }
     }
 
-    static func decodeResponseData(data: Data) -> [TwitchMovie] {
+    func decodeResponseData(data: Data) -> [TwitchMovie] {
         do {
             print("レスポンス:", String(data: data, encoding: .utf8) ?? "No data")
             let decoder = JSONDecoder()

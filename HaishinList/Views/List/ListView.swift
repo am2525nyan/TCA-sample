@@ -35,4 +35,23 @@ struct ListView: View {
     }
 }
 
+#Preview {
+
+    
+     ListView(
+            store: .init(
+                initialState: ListReducer.State(),
+                reducer: {
+                    ListReducer()
+                }
+            ){
+                withDependencies: do {
+                    $0.twitchAPIClient = MockTwitchAPIClient()
+                    $0.youtubeAPIClient = MockYoutubeAPIClient.shared
+                }
+            }
+        )
+    }
+
+
 

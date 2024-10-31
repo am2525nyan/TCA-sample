@@ -18,16 +18,16 @@ struct ListReducer {
         var youtubeAPIClient: YoutubeAPIClientProtocol
         var mainQueue: AnySchedulerOf<DispatchQueue>
 
-        static let live = Self(
-            twitchAPIClient: TwitchAPIClient.shared,
-            youtubeAPIClient: YoutubeAPIClient.shared,
-            mainQueue: .main
-        )
-        static let mock = Self(
-            twitchAPIClient: MockTwitchAPIClient.shared,
-            youtubeAPIClient: MockYoutubeAPIClient.shared,
-            mainQueue: .main
-        )
+//        static let live = Self(
+//            twitchAPIClient: TwitchAPIClient.shared,
+//            youtubeAPIClient: YoutubeAPIClient.shared,
+//            mainQueue: .main
+//        )
+//        static let mock = Self(
+//            twitchAPIClient: MockTwitchAPIClient(),
+//            youtubeAPIClient: MockYoutubeAPIClient.shared,
+//            mainQueue: .main
+//        )
     }
 
     @ObservableState
@@ -37,6 +37,8 @@ struct ListReducer {
         var isLoading: Bool = false
         var errorMessage: String? = nil
         var movies: [Movie] = []
+        
+      
     }
 
     enum Action {
@@ -119,15 +121,15 @@ struct ListReducer {
 }
 
 private enum TwitchAPIClientKey: DependencyKey {
-    static let liveValue = TwitchAPIClient.shared
+    static let liveValue: TwitchAPIClientProtocol = TwitchAPIClient.shared
 
 }
 private enum YoutubeAPIClientKey: DependencyKey {
-    static let liveValue = YoutubeAPIClient.shared
+    static let liveValue: YoutubeAPIClientProtocol = YoutubeAPIClient.shared
 
 }
 private enum TwitchAPICientTestKey: TestDependencyKey {
-    static var testValue = MockTwitchAPIClient.shared
+    static var testValue = MockTwitchAPIClient()
 
 }
 
@@ -137,11 +139,11 @@ private enum YoutubeAPICientTestKey: TestDependencyKey {
 }
 
 extension DependencyValues {
-    var twitchAPIClient: TwitchAPIClient {
+    var twitchAPIClient: TwitchAPIClientProtocol {
         get { self[TwitchAPIClientKey.self] }
         set { self[TwitchAPIClientKey.self] = newValue }
     }
-    var youtubeAPIClient: YoutubeAPIClient {
+    var youtubeAPIClient: YoutubeAPIClientProtocol {
         get { self[YoutubeAPIClientKey.self] }
         set { self[YoutubeAPIClientKey.self] = newValue }
     }

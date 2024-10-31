@@ -6,11 +6,7 @@
 //
 
 import Foundation
-final class MockTwitchAPIClient: TwitchAPIClientProtocol {
-    static let shared = MockTwitchAPIClient()
-    private init(){
-        
-    }
+class MockTwitchAPIClient: TwitchAPIClientProtocol {
     
     func fetchMovies() async throws -> [TwitchMovie] {
         return [

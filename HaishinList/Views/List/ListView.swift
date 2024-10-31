@@ -10,14 +10,14 @@ import SwiftUI
 
 struct ListView: View {
     let store: StoreOf<ListReducer>
-    @Environment(\.openURL) private var openURL
+  
     var body: some View {
         VStack {
             if store.movies != [] {
                 List {
                     
                     ForEach(store.movies) { movie in
-                        ListItemView(movie: movie, openURL: openURL)
+                        ListItemView(movie: movie)
                     }
                 }
                 .refreshable {

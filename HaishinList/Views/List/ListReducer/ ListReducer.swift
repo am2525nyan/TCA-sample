@@ -23,6 +23,11 @@ struct ListReducer {
             youtubeAPIClient: .live,
             mainQueue: .main
         )
+        static let mock = Self(
+            twitchAPIClient: .mock,
+            youtubeAPIClient: .live,
+            mainQueue: .main
+        )
     }
 
     @ObservableState
@@ -45,37 +50,42 @@ struct ListReducer {
             switch action {
             case .fetchMovies:
                 state.isLoading = true
-                state.errorMessage = nil
+                state.errorMessage = ""
                 state.movies = []
                 state.youtubeMovie = []
                 state.twitchMovies = []
                 return .run { send in
-                    await send(
-                        .fetchTwitchMoviesResponse(
-                            TaskResult {
-                                try await self.twitchAPIClient.fetchMovie()
-                            }))
-                    await send(
-                        .fetchYoutubeMoviesResponse(
-                            TaskResult {
-                                try await self.youtubeAPIClient.fetchMovies()
-                            }))
+                    do {
+                        let (twitchReq, youtubeReq) = await (
+                            try twitchAPIClient.fetchMovies(),
+                            try youtubeAPIClient.fetchMovies()
+                        )
+
+                        await send(
+                            .fetchTwitchMoviesResponse(.success(twitchReq)))
+                        await send(
+                            .fetchYoutubeMoviesResponse(.success(youtubeReq)))
+                    } catch {
+                        await send(.fetchTwitchMoviesResponse(.failure(error)))
+                        await send(.fetchYoutubeMoviesResponse(.failure(error)))
+                        print(error.localizedDescription)
+
+                    }
                 }
 
             case let .fetchTwitchMoviesResponse(.success(movies)):
                 state.isLoading = false
-                state.twitchMovies = movies  // 複数の映画データを格納
-                print(movies, "a")
+                state.twitchMovies = movies
                 for twitchMovie in movies {
                     let movie = Movie(
                         title: twitchMovie.title,
                         name: twitchMovie.name,
                         thumbnailUrl: twitchMovie.thumbnailUrl,
-                        streamUrl: twitchMovie.streamUrl, publishedAt: twitchMovie.publishedAt
+                        streamUrl: twitchMovie.streamUrl,
+                        publishedAt: twitchMovie.publishedAt
                     )
 
                     state.movies.append(movie)
-                    print(movie)
                 }
 
                 return .none
@@ -92,7 +102,8 @@ struct ListReducer {
                         title: youtubeMovie.title,
                         name: youtubeMovie.name,
                         thumbnailUrl: youtubeMovie.thumbnailUrl,
-                        streamUrl: youtubeMovie.streamUrl, publishedAt: youtubeMovie.publishedAt)
+                        streamUrl: youtubeMovie.streamUrl,
+                        publishedAt: youtubeMovie.publishedAt)
                     state.movies.append(movie)
                 }
 
@@ -113,6 +124,10 @@ private enum TwitchAPIClientKey: DependencyKey {
 }
 private enum YoutubeAPIClientKey: DependencyKey {
     static let liveValue = YoutubeAPIClient.live
+
+}
+private enum TwitchAPICientTestKey: TestDependencyKey {
+    static var testValue = TwitchAPIClient.mock
 
 }
 

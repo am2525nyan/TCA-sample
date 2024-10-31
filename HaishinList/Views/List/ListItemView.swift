@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ListItemView: View {
     let movie: Movie
-    let openURL: OpenURLAction
+    @Environment(\.openURL) private var openURL
     var body: some View {
         VStack {
             AsyncImage(url: URL(string: movie.thumbnailUrl)) {

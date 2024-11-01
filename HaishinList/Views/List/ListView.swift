@@ -47,7 +47,7 @@ struct ListView: View {
             ){
                 withDependencies: do {
                     $0.twitchAPIClient = MockTwitchAPIClient()
-                    $0.youtubeAPIClient = MockYoutubeAPIClient.shared
+                    $0.youtubeAPIClient = MockYoutubeAPIClient()
                 }
             }
         )

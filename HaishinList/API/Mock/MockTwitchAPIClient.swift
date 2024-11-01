@@ -7,12 +7,11 @@
 
 import Foundation
 class MockTwitchAPIClient: TwitchAPIClientProtocol {
-    
     func fetchMovies() async throws -> [TwitchMovie] {
         return [
             TwitchMovie(
                 title: "テストタイトル", user_name: "テストさん",
-                thumbnailUrl: "https://x.com/am2525nyan", userLogin: "saki",
+                thumbnailUrl: "https://pbs.twimg.com/media/GbIVi6uaUAAnO_U?format=jpg&name=large", userLogin: "saki",
                 publishedAt: "2024-10-23T01:46:59Z")
         ]
     }

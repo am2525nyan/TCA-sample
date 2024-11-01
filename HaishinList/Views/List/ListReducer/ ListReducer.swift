@@ -17,17 +17,6 @@ struct ListReducer {
         var twitchAPIClient: TwitchAPIClientProtocol
         var youtubeAPIClient: YoutubeAPIClientProtocol
         var mainQueue: AnySchedulerOf<DispatchQueue>
-
-//        static let live = Self(
-//            twitchAPIClient: TwitchAPIClient.shared,
-//            youtubeAPIClient: YoutubeAPIClient.shared,
-//            mainQueue: .main
-//        )
-//        static let mock = Self(
-//            twitchAPIClient: MockTwitchAPIClient(),
-//            youtubeAPIClient: MockYoutubeAPIClient.shared,
-//            mainQueue: .main
-//        )
     }
 
     @ObservableState
@@ -134,7 +123,7 @@ private enum TwitchAPICientTestKey: TestDependencyKey {
 }
 
 private enum YoutubeAPICientTestKey: TestDependencyKey {
-    static var testValue = MockYoutubeAPIClient.shared
+    static var testValue = MockYoutubeAPIClient()
 
 }
 

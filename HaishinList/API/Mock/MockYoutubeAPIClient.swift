@@ -6,9 +6,7 @@
 //
 
 import Foundation
-final class MockYoutubeAPIClient: YoutubeAPIClientProtocol {
-    static let shared = MockYoutubeAPIClient()
-    private init() {}
+class MockYoutubeAPIClient: YoutubeAPIClientProtocol {
     func fetchMovies() async throws -> [YoutubeMovie] {
         return [
             YoutubeMovie(

@@ -44,12 +44,7 @@ struct ListView: View {
                 reducer: {
                     ListReducer()
                 }
-            ){
-                withDependencies: do {
-                    $0.twitchAPIClient = MockTwitchAPIClient()
-                    $0.youtubeAPIClient = MockYoutubeAPIClient()
-                }
-            }
+            )
         )
     }
 

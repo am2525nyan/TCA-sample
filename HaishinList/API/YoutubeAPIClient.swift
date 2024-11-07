@@ -66,8 +66,7 @@ extension YoutubeAPIClient {
                                 
                             } catch {
                                 print("デコード失敗:", error.localizedDescription)
-                                continuation.resume(
-                                    throwing: APIError.decodingError(error))
+                             
                             }
                         case .failure(let error):
                             print("失敗！", error.localizedDescription)

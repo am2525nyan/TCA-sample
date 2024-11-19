@@ -69,6 +69,9 @@ struct ListReducer {
             case .fetchMoreMovies:
                 state.page += 1
                 let nextPage = state.page
+                if state.lastPage {
+                    return .none
+                }
                 return .run { send in
                     do {
                         let (twitchReq, youtubeReq) = await (
@@ -105,6 +108,7 @@ struct ListReducer {
                 return .none
             case let .fetchTwitchMoviesResponse(.failure(error)):
                 state.isLoading = false
+           state.lastPage = true
                 state.errorMessage = error.localizedDescription
                 return .none
                 
@@ -125,6 +129,7 @@ struct ListReducer {
                 
             case let .fetchYoutubeMoviesResponse(.failure(error)):
                 state.isLoading = false
+                state.lastPage = true
                 state.errorMessage = error.localizedDescription
                 return .none
             }

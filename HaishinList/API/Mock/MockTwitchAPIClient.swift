@@ -8,9 +8,10 @@
 import Foundation
 class MockTwitchAPIClient: TwitchAPIClientProtocol {
     func fetchMovies(page: Int) async throws -> [TwitchMovie] {
-        return (0...10).map { _ in
+        let count = 10
+        return  (0..<count).map { index in
             TwitchMovie(
-                title: "テストタイトル",
+                title: "テストタイトル \(index + 1)",
                 user_name: "テストさん",
                 thumbnailUrl: "https://pbs.twimg.com/media/GbIVi6uaUAAnO_U?format=jpg&name=large",
                 userLogin: "saki",

@@ -18,7 +18,7 @@ struct ListView: View {
                         ListItemView(movie: movie)
                             .onAppear(){
                                 if store.movies.last == movie {
-                                    store.send(.fetchMovies, animation: .default)
+                                    store.send(.fetchMoreMovies, animation: .default)
                                 }
                             }
                     }

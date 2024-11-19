@@ -12,13 +12,13 @@ import Foundation
 struct ListReducer {
     @Dependency(\.twitchAPIClient) var twitchAPIClient
     @Dependency(\.youtubeAPIClient) var youtubeAPIClient
-
+    
     struct Environment {
         var twitchAPIClient: TwitchAPIClientProtocol
         var youtubeAPIClient: YoutubeAPIClientProtocol
         var mainQueue: AnySchedulerOf<DispatchQueue>
     }
-
+    
     @ObservableState
     struct State {
         var twitchMovies: [TwitchMovie]? = []
@@ -26,16 +26,18 @@ struct ListReducer {
         var isLoading: Bool = false
         var errorMessage: String? = nil
         var movies: [Movie] = []
+        var page: Int = 0
+        var lastPage: Bool = false
         
-      
     }
-
+    
     enum Action {
         case fetchMovies
+        case fetchMoreMovies
         case fetchTwitchMoviesResponse(TaskResult<[TwitchMovie]>)
         case fetchYoutubeMoviesResponse(TaskResult<[YoutubeMovie]>)
     }
-
+    
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -45,13 +47,14 @@ struct ListReducer {
                 state.movies = []
                 state.youtubeMovie = []
                 state.twitchMovies = []
+                state.page = 1
                 return .run { send in
                     do {
                         let (twitchReq, youtubeReq) = await (
-                            try twitchAPIClient.fetchMovies(),
-                            try youtubeAPIClient.fetchMovies()
+                            try twitchAPIClient.fetchMovies(page: 1),
+                            try youtubeAPIClient.fetchMovies(page: 1)
                         )
-
+                        
                         await send(
                             .fetchTwitchMoviesResponse(.success(twitchReq)))
                         await send(
@@ -60,10 +63,30 @@ struct ListReducer {
                         await send(.fetchTwitchMoviesResponse(.failure(error)))
                         await send(.fetchYoutubeMoviesResponse(.failure(error)))
                         print(error.localizedDescription)
-
+                        
                     }
                 }
-
+            case .fetchMoreMovies:
+                state.page += 1
+                let nextPage = state.page
+                return .run { send in
+                    do {
+                        let (twitchReq, youtubeReq) = await (
+                            try twitchAPIClient.fetchMovies(page: nextPage),
+                            try youtubeAPIClient.fetchMovies(page: nextPage)
+                        )
+                        await send(
+                            .fetchTwitchMoviesResponse(.success(twitchReq)))
+                        await send(
+                            .fetchYoutubeMoviesResponse(.success(youtubeReq)))
+                    }catch {
+                        await send(.fetchTwitchMoviesResponse(.failure(error)))
+                        await send(.fetchYoutubeMoviesResponse(.failure(error)))
+                        print(error.localizedDescription)
+                        
+                    }
+                }
+                
             case let .fetchTwitchMoviesResponse(.success(movies)):
                 state.isLoading = false
                 state.twitchMovies = movies
@@ -75,16 +98,16 @@ struct ListReducer {
                         streamUrl: twitchMovie.streamUrl,
                         publishedAt: twitchMovie.publishedAt
                     )
-
+                    
                     state.movies.append(movie)
                 }
-
+                
                 return .none
             case let .fetchTwitchMoviesResponse(.failure(error)):
                 state.isLoading = false
                 state.errorMessage = error.localizedDescription
                 return .none
-
+                
             case let .fetchYoutubeMoviesResponse(.success(movies)):
                 state.isLoading = false
                 state.youtubeMovie = movies
@@ -97,9 +120,9 @@ struct ListReducer {
                         publishedAt: youtubeMovie.publishedAt)
                     state.movies.append(movie)
                 }
-
+                
                 return .none
-
+                
             case let .fetchYoutubeMoviesResponse(.failure(error)):
                 state.isLoading = false
                 state.errorMessage = error.localizedDescription
@@ -112,7 +135,7 @@ struct ListReducer {
 private enum TwitchAPIClientKey: DependencyKey {
     static let liveValue: TwitchAPIClientProtocol = TwitchAPIClient.shared
     static let previewValue: any TwitchAPIClientProtocol = MockTwitchAPIClient()
-
+    
 }
 private enum YoutubeAPIClientKey: DependencyKey {
     static let liveValue: YoutubeAPIClientProtocol = YoutubeAPIClient.shared

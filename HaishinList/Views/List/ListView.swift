@@ -8,15 +8,19 @@ import ComposableArchitecture
 import SwiftUI
 
 struct ListView: View {
-    let store: StoreOf<ListReducer>
+    var store: StoreOf<ListReducer>
 
     var body: some View {
         VStack {
             if store.movies != [] {
                 List {
-
                     ForEach(store.movies) { movie in
                         ListItemView(movie: movie)
+                            .onAppear(){
+                                if store.movies.last == movie {
+                                    store.send(.fetchMovies, animation: .default)
+                                }
+                            }
                     }
                 }
                 .refreshable {

@@ -8,5 +8,5 @@
 import Foundation
 
 protocol TwitchAPIClientProtocol {
-    func fetchMovies() async throws -> [TwitchMovie]
+    func fetchMovies(page: Int) async throws -> [TwitchMovie]
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 class MockYoutubeAPIClient: YoutubeAPIClientProtocol {
-    func fetchMovies() async throws -> [YoutubeMovie] {
+    func fetchMovies(page: Int) async throws -> [YoutubeMovie] {
         return [
             YoutubeMovie(
                 title: "テスト", name: "テストさん", videoId: "zuo7RdUUcmE",

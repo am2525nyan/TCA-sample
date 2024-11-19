@@ -8,7 +8,7 @@
 import Foundation
 
 class MockFailureTwitchAPIClient: TwitchAPIClientProtocol {
-    func fetchMovies() async throws -> [TwitchMovie] {
+    func fetchMovies(page: Int) async throws -> [TwitchMovie] {
         throw APIError.invalidURL
     }
 }

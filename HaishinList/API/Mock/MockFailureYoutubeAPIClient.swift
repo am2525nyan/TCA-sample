@@ -8,7 +8,7 @@
 import Foundation
 
 class MockFailureYoutubeAPIClient: YoutubeAPIClientProtocol {
-    func fetchMovies() async throws -> [YoutubeMovie] {
+    func fetchMovies(page: Int) async throws -> [YoutubeMovie] {
         throw APIError.invalidURL
     }
 }

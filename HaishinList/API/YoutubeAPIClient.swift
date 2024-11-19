@@ -17,7 +17,7 @@ final class YoutubeAPIClient: YoutubeAPIClientProtocol {
 }
 
 extension YoutubeAPIClient {
-    func fetchMovies() async throws -> [YoutubeMovie] {
+    func fetchMovies(page: Int) async throws -> [YoutubeMovie] {
         
         let env = try! LoadEnv()
         var urlString = URLComponents()

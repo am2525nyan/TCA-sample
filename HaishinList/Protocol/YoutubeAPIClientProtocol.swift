@@ -7,6 +7,6 @@
 import Foundation
 
 protocol YoutubeAPIClientProtocol {
-    func fetchMovies() async throws -> [YoutubeMovie]
+    func fetchMovies(page:Int) async throws -> [YoutubeMovie]
 }
 

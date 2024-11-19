@@ -19,7 +19,7 @@ final class TwitchAPIClient: TwitchAPIClientProtocol {
 
 extension TwitchAPIClient {
 
-    func fetchMovies() async throws -> [TwitchMovie] {
+    func fetchMovies(page: Int) async throws -> [TwitchMovie] {
 
         let env = try! LoadEnv()
         var url = URLComponents()

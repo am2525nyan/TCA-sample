@@ -3,3 +3,6 @@
 .env
 .build/
 xcuserdata/
+fastlane/
+AuthKey VKGTZWT49J.p8
+Gemfile.lock

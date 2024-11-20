@@ -8,7 +8,7 @@
 import Foundation
 class MockYoutubeAPIClient: YoutubeAPIClientProtocol {
     func fetchMovies(page: Int) async throws -> [YoutubeMovie] {
-        let count = 10
+        let count = 3
         return  (0..<count).map { index in
             YoutubeMovie(
                 title: "テストタイトル \(index + 1)",
